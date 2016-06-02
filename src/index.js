@@ -40,30 +40,100 @@ const tabList = [
 ];
 
 class Tab extends React.Component {
+  handleClick(e) {
+    e.preventDefault();
+    this.props.handleClick();
+  }
   render() {
     return (
-      <li><a href={this.props.url}>{this.props.name}</a></li>
+      <li className={this.props.isCurrent ? 'current' : null}>
+        <a onClick={this.handleClick} href={this.props.url}>
+            {this.props.name}
+        </a>
+      </li>
     );
   }
 }
 
 class Tabs extends React.Component {
+  handleClick(tab) {
+    this.props.changeTab(tab);
+  }
   render() {
     return (
       <nav>
         <ul>
-          {this.props.tabList.map((tab) => {
-            return (
-              <Tab url={tab.url} name={tab.name} />
-            );
-          })}
+        {this.props.tabList.map((tab) => {
+          return (
+            <Tab
+              handleClick={this.handleClick.bind(this, tab)}
+              key={tab.id}
+              url={tab.url}
+              name={tab.name}
+              isCurrent={(this.props.currentTab === tab.id)} />
+          );
+        }, bind(this))}
         </ul>
       </nav>
     );
   }
 }
 
+class Content extends React.Component {
+  render() {
+    return(
+      <div className="content">
+        {this.props.currentTab === 1 ?
+        <div className="mike">
+          <img src="http://s.mlkshk.com/r/104TN" />
+        </div>
+        :null}
+
+        {this.props.currentTab === 2 ?
+        <div className="donnie">
+          <img src="http://s.mlkshk.com/r/103AG" />
+        </div>
+        :null}
+
+        {this.props.currentTab === 3 ?
+        <div className="raph">
+            <img src="http://s.mlkshk.com/r/JAUD" />
+        </div>
+        :null}
+
+        {this.props.currentTab === 4 ?
+        <div className="leo">
+            <img src="http://s.mlkshk.com/r/ZJPL" />
+        </div>
+        :null}
+      </div>
+    );
+  }
+}
+
+class App extends React.Component {
+  getInitialState() {
+    return {
+      tabs: tabs,
+      currentTab: 1
+    };
+  }
+  changeTab(tab) {
+    this.setState({ currentTab: tab.id });
+  }
+  render() {
+    return (
+      <div>
+        <Tabs
+          currentTab={this.state.currentTab}
+          tabList={tabList}
+          changeTab={this.changeTab} />
+      </div>
+    );
+  }
+}
+
 ReactDOM.render(
-    <Tabs tabList={tabList} />,
+    <App />,
     document.getElementById('sample')
 );

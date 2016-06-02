@@ -112,9 +112,10 @@ class Content extends React.Component {
 }
 
 class App extends React.Component {
-  getInitialState() {
+  constructor(props) {
+    super();
     return {
-      tabs: tabs,
+      tabList: tabList,
       currentTab: 1
     };
   }

@@ -1,5 +1,46 @@
 <html>
 <head>
+  <style>
+  body, div, h1, h2, ul, li {
+    padding: 0;
+    margin: 0;
+  }
+  .main {
+    padding: 20px;
+  }
+  [aria-hidden="true"] {
+    display: none;
+  }
+  [role="tablist"] {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+  }
+  [role="tablist"] > * {
+    display: inline-block;
+    margin-right: 10px;
+  }
+  [role="tablist"] [role="tab"] {
+    position: relative;
+    top: 1px;
+    border: 1px solid #aaa;
+    border-top-right-radius: 3px;
+    border-top-left-radius: 3px;
+    background: #fff;
+    padding: 10px 30px;
+    cursor: pointer;
+  }
+  [role="tablist"] [role="tab"][aria-selected="true"] {
+    border-bottom: 1px solid #fff;
+    color: #f00;
+    cursor: default;
+  }
+  [role="tabpanel"] {
+    padding: 30px 50px;
+    color: #333;
+    border: 1px solid #aaa;
+  }
+  </style>
   <title>app</title>
   <meta charset="utf8" >
 </head>

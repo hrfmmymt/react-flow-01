@@ -1,140 +1,101 @@
 import ReactDOM from 'react-dom';
 import React from 'react';
 
-// const el = document.querySelector('.main');
-// ReactDOM.render(<h1>Hello</h1>, el)
-
-// class App extends React.Component {
-//   render() {
-//     return (
-//       <div>
-//         Hello, world!
-//       </div>
-//     );
-//   }
-// }
-
-// var Tabs = React.createClass({
-//     render: function(){
-//         return (
-//             <nav>
-//                 <ul></ul>
-//             </nav>
-//         )
-//     }
-// });
-
-// var Tab = React.createClass({
-//     render: function(){
-//         return (
-//             <li></li>
-//         )
-//     }
-// });
-
-const tabList = [
-  { 'id': 1, 'name': 'Tab1', 'url': '/tab1' },
-  { 'id': 2, 'name': 'Tab2', 'url': '/tab2' },
-  { 'id': 3, 'name': 'Tab3', 'url': '/tab3' },
-  { 'id': 4, 'name': 'Tab4', 'url': '/tab4' }
-];
-
-class Tab extends React.Component {
-  handleClick(e) {
-    e.preventDefault();
-    this.props.handleClick();
-  }
-  render() {
-    return (
-      <li className={this.props.isCurrent ? 'current' : null}>
-        <a onClick={this.handleClick} href={this.props.url}>
-            {this.props.name}
-        </a>
-      </li>
-    );
-  }
-}
+const KEYCODE_LEFT  = 37;
+const KEYCODE_RIGHT = 39;
 
 class Tabs extends React.Component {
-  handleClick(tab) {
-    this.props.changeTab(tab);
-  }
-  render() {
-    return (
-      <nav>
-        <ul>
-        {this.props.tabList.map((tab) => {
-          return (
-            <Tab
-              handleClick={this.handleClick.bind(this, tab)}
-              key={tab.id}
-              url={tab.url}
-              name={tab.name}
-              isCurrent={(this.props.currentTab === tab.id)} />
-          );
-        }, bind(this))}
-        </ul>
-      </nav>
-    );
-  }
-}
 
-class Content extends React.Component {
-  render() {
-    return(
-      <div className="content">
-        {this.props.currentTab === 1 ?
-        <div className="mike">
-          <img src="http://s.mlkshk.com/r/104TN" />
-        </div>
-        :null}
-
-        {this.props.currentTab === 2 ?
-        <div className="donnie">
-          <img src="http://s.mlkshk.com/r/103AG" />
-        </div>
-        :null}
-
-        {this.props.currentTab === 3 ?
-        <div className="raph">
-            <img src="http://s.mlkshk.com/r/JAUD" />
-        </div>
-        :null}
-
-        {this.props.currentTab === 4 ?
-        <div className="leo">
-            <img src="http://s.mlkshk.com/r/ZJPL" />
-        </div>
-        :null}
-      </div>
-    );
-  }
-}
-
-class App extends React.Component {
-  constructor(props) {
+  constructor() {
     super();
-    return {
-      tabList: tabList,
-      currentTab: 1
+    this.state = {
+      index: 0
     };
   }
-  changeTab(tab) {
-    this.setState({ currentTab: tab.id });
+
+  updateIndex(i, fn) {
+    this.setState({index: i}, () => {
+      React.findDOMNode(this.refs['tab' + i]).focus();
+    });
   }
+
+  onClickTab(i) {
+    this.updateIndex(i);
+  }
+
+  onMoveFocus(e) {
+    let curtIndex = this.state.index;
+
+    switch(e.keyCode) {
+      case KEYCODE_LEFT:
+        if (curtIndex !== 0) {
+          this.updateIndex(curtIndex - 1);
+        }
+        break;
+      case KEYCODE_RIGHT:
+        if (curtIndex !== this.props.children.length - 1) {
+          this.updateIndex(curtIndex + 1);
+        }
+        break;
+    }
+  }
+
   render() {
+    let curtIndex = this.state.index;
+    
+    let tabs = this.props.children.map((child, i) => {
+      return (
+        <li role="presentation" key={i}>
+          <button role="tab"
+                  ref={'tab' + i}
+                  tabIndex={curtIndex === i ? '0' : '-1'}
+                  aria-selected={curtIndex === i ? 'true' : 'false'}
+                  aria-controls={child.props.id}
+                  onKeyUp={this.onMoveFocus.bind(this)}
+                  onClick={this.onClickTab.bind(this, i)}>
+            {child.props.label}
+          </button>
+        </li>
+      );
+    });
+
+    let panels = this.props.children.map((child, i) => {
+      return (
+        <div role="tabpanel"
+             key={i}
+             id={child.props.id}
+             aria-hidden={curtIndex === i ? 'false' : 'true'}>
+          {child}
+        </div>
+      );
+    });
+
     return (
       <div>
-        <Tabs
-          currentTab={this.state.currentTab}
-          tabList={tabList}
-          changeTab={this.changeTab} />
+        <ul role="tablist"
+            className={this.props.className}>
+          {tabs}
+        </ul>
+        {panels}
       </div>
     );
   }
 }
 
-ReactDOM.render(
-    <App />,
-    document.getElementById('sample')
+React.render(
+  <div>
+    <h1>React Tabs</h1>
+    <Tabs>
+      <div id="tabset1" label="1st Panel">
+        <h2>1st Panel</h2>
+      </div>
+      <div id="tabset2" label="2nd Panel">
+        <h2>2nd Panel</h2>
+      </div>
+      <div id="tabset3" label="3rd Panel">
+        <h2>3rd Panel</h2>
+      </div>
+    </Tabs>
+  </div>,
+  document.getElementById('sample')
 );
